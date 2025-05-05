@@ -1,5 +1,5 @@
 /*
-PLAN 
+PLAN LAB EDGE INTERRUPTS
 1. Make external button as actuator ( PA5 )
 2. Activate clock (RCGCGPIO)
 3. Set all registers needed for Edge Interrupt( DIR, DEN, PUR, IS, IBE, ICR, IM and such)
@@ -36,6 +36,10 @@ void EdgeInterrupt_Init (void)
 	GPIO_PORTA_DIR_R &= 0x10; //0001 0000 PA4 Output, PA5 input
 	GPIO_PORTA_DEN_R |= 0x30; // 0011 0000 PA4 and PA5 enable digital function
 	GPIO_PORTA_PUR_R |= 0x20; // 0010 0000 PA5 input, enable weak pull up
+	GPIO_PORTA_IS_R &= ~0x20; // PA5 clear edge sensitive
+	GPIO_PORTA_IBE_R &= ~0x20; //Not both Edges ( fully controlled by GPIOIEV)
+	GPIO_PORTA_IEV_R &= ~0x20; //falling edge only on PA5
+	
 	
 	
 }
