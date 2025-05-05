@@ -1014,3 +1014,25 @@ __user_initial_stackheap
 
 
                 END
+
+
+;*********** DisableInterrupts ***************
+; disable interrupts               
+; inputs:  none        
+; outputs: none               
+DisableInterrupts  CPSID  I 	;set I=1
+    	           BX 	LR
+ 
+;*********** EnableInterrupts ***************
+; enable interrupts               
+; inputs:  none        
+; outputs: none               
+EnableInterrupts   CPSIE  I	;set I=0
+    	           BX 	LR
+;*********** WaitForInterrupt ************************
+; go to low power mode while waiting for the next interrupt
+; inputs:  none
+; outputs: none
+WaitForInterrupt
+    	WFI
+    	BX 	LR

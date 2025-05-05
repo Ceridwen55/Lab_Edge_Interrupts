@@ -11,6 +11,13 @@ PLAN LAB EDGE INTERRUPTS
 
 
 #include <stdint.h>
+#include "TM4C129.h"
+
+extern void EnableInterrupts(void);  // Declaration from startup.s EnableInterrupts
+extern void DisableInterrupts(void); // Declaration from startup.s DisableInterrupts
+extern void WaitForInterrupt(void);  // Declaration from startup.s WaitForInterrup
+
+volatile uint8_t ledStatus = 0;  // 0 = off, 1 = on
 
 //ADDRESS
 #define SYSCTL_RCGCGPIO_R       (*((volatile uint32_t *)0x400FE608))
@@ -46,10 +53,22 @@ void EdgeInterrupt_Init (void)
 	NVIC_PRI0_R = (NVIC_PRI0_R & 0xFFFFFF1F) | 0xA0; //priority 5 ( bit 7-5 is 101 which is 5 in decimal, but based on hex postition its 10 so 0xA0)
 	NVIC_EN0_R = 0x01; //enable interrupt 0 port A 
 	
+	EnableInterrupts();
+	
 	
 }
 
 void GPIOA_Handler(void)
 {
+	GPIO_PORTA_ICR_R = 0x20; // Acknowledge/clear interrupt
 	
+	 if (ledStatus == 0) {  // If LED off
+        GPIO_PORTA_DATA_R |= 0x10;  // Turn on LED PA4
+        ledStatus = 1;  // Change Status Value
+    } else {  // If LED on
+        GPIO_PORTA_DATA_R &= ~0x10;  // Turn Off LED
+        ledStatus = 0;  // Change status Value
+    }
 }
+
+
