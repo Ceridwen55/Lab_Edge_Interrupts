@@ -39,7 +39,12 @@ void EdgeInterrupt_Init (void)
 	GPIO_PORTA_IS_R &= ~0x20; // PA5 clear edge sensitive
 	GPIO_PORTA_IBE_R &= ~0x20; //Not both Edges ( fully controlled by GPIOIEV)
 	GPIO_PORTA_IEV_R &= ~0x20; //falling edge only on PA5
+	GPIO_PORTA_ICR_R  = 0x20; //clear bit 5 (PA5) interrupt
+	GPIO_PORTA_IM_R |= 0x20; //Arm interrupt at PA5
 	
+	
+	NVIC_PRI0_R = (NVIC_PRI0_R & 0xFFFFFF1F) | 0xA0; //priority 5 ( bit 7-5 is 101 which is 5 in decimal, but based on hex postition its 10 so 0xA0)
+	NVIC_EN0_R = 0x01; //enable interrupt 0 port A 
 	
 	
 }
