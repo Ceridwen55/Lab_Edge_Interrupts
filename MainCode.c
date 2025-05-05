@@ -71,4 +71,13 @@ void GPIOA_Handler(void)
     }
 }
 
+int main (void)
+{
+	EdgeInterrupt_Init();
+	
+	while(1)
+	{
+		WaitForInterrupt();
+	}
+}
 
