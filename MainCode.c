@@ -13,9 +13,12 @@ PLAN LAB EDGE INTERRUPTS
 #include <stdint.h>
 #include "TM4C129.h"
 
-extern void EnableInterrupts(void);  // Declaration from startup.s EnableInterrupts
-extern void DisableInterrupts(void); // Declaration from startup.s DisableInterrupts
-extern void WaitForInterrupt(void);  // Declaration from startup.s WaitForInterrup
+void EdgeInterrupt_Init(void);
+
+void EnableInterrupts(void);  // Declaration from startup.s EnableInterrupts
+void WaitForInterrupt(void);  // Declaration from startup.s WaitForInterrup
+
+void GPIOA_Handler(void);
 
 volatile uint8_t ledStatus = 0;  // 0 = off, 1 = on
 
@@ -40,7 +43,8 @@ volatile uint8_t ledStatus = 0;  // 0 = off, 1 = on
 void EdgeInterrupt_Init (void)
 {
 	SYSCTL_RCGCGPIO_R |= 0x01; // Activate Clock for Port A
-	GPIO_PORTA_DIR_R &= 0x10; //0001 0000 PA4 Output, PA5 input
+	GPIO_PORTA_DIR_R &= ~0x20; // Clear PA5 (input)
+	GPIO_PORTA_DIR_R |= 0x10;  // Set PA4 (output)
 	GPIO_PORTA_DEN_R |= 0x30; // 0011 0000 PA4 and PA5 enable digital function
 	GPIO_PORTA_PUR_R |= 0x20; // 0010 0000 PA5 input, enable weak pull up
 	GPIO_PORTA_IS_R &= ~0x20; // PA5 clear edge sensitive
@@ -69,6 +73,17 @@ void GPIOA_Handler(void)
         GPIO_PORTA_DATA_R &= ~0x10;  // Turn Off LED
         ledStatus = 0;  // Change status Value
     }
+
+}
+
+// Enable global interrupts
+void EnableInterrupts(void) {
+    __asm("CPSIE I");  // CPSIE I = Clear Interrupt Disable bit, enabling interrupts
+}
+
+// Wait for interrupt (low-power mode, usually executed in an infinite loop)
+void WaitForInterrupt(void) {
+    __asm("WFI");  // WFI = Wait For Interrupt instruction
 }
 
 int main (void)
